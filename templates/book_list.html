@@ -1,3 +1,173 @@
-<h1>Название книги: {{ title }}</h1>
-<h3>Автор: {{ author }}</h3>
-<h3>Жанр: {{ genre }}</h3>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Каталог книг</title>
+    <style>
+        /* Базовые стили для всей страницы */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+        }
+
+        /* Сетка для карточек (адаптивная: сама подстраивается под экран) */
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Стиль самой карточки книги */
+        .book-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Эффект при наведении мышки на книгу */
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Блок для изображения */
+        .book-image-container {
+            width: 100%;
+            height: 380px;
+            background-color: #eaeaea;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .book-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Картинка аккуратно заполняет блок, не растягиваясь */
+            transition: transform 0.5s ease;
+        }
+
+        .book-card:hover img {
+            transform: scale(1.05); /* Легкое увеличение обложки при наведении */
+        }
+
+        /* Контент внутри карточки (текст) */
+        .book-info {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .book-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin: 0 0 10px 0;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .book-meta {
+            font-size: 0.95rem;
+            color: #555;
+            margin: 5px 0;
+        }
+
+        .book-meta strong {
+            color: #7f8c8d;
+        }
+
+        /* Стили для заметок */
+        .book-comment {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #e0e0e0;
+            font-size: 0.9rem;
+            color: #4b5563;
+            flex-grow: 1; /* Толкает кнопку "Подробнее" всегда вниз */
+        }
+
+        .no-comment {
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        /* Красивая кнопка "Подробнее" */
+        .btn-more {
+            display: block;
+            text-align: center;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-more:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Список книг</h1>
+
+    <div class="books-grid">
+        {% for book in books %}
+            <div class="book-card">
+
+                <!-- Блок обложки с проверкой на существование картинки -->
+                <div class="book-image-container">
+                    {% if book.image %}
+                        <img src="{{ book.image.url }}" alt="{{ book.title }}">
+                    {% else %}
+                        <!-- Красивая заглушка, если картинки нет в базе данных -->
+                        <div style="display: flex; height: 100%; align-items: center; justify-content: center; color: #aaa; font-style: italic;">
+                            Нет обложки
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Блок информации -->
+                <div class="book-info">
+                    <h3 class="book-title">{{ book.title }}</h3>
+                    <p class="book-meta"><strong>Автор:</strong> {{ book.author }}</p>
+                    <p class="book-meta"><strong>Жанр:</strong> {{ book.genre }}</p>
+
+                    <div class="book-comment">
+                        <strong>Заметка:</strong>
+                        {% if book.user_comment %}
+                            {{ book.user_comment }}
+                        {% else %}
+                            <span class="no-comment">Нет заметок к книге</span>
+                        {% endif %}
+                    </div>
+
+                    <a href="{% url 'book_detail' book.id %}" class="btn-more">Подробнее</a>
+                </div>
+
+            </div>
+        {% endfor %}
+    </div>
+
+</body>
+</html>
