@@ -1,0 +1,9 @@
+<h1>Изменить товар {{ basket_product_id.title }}</h1>
+
+<form action="{% url 'update_product' basket_product_id.id %}" method="POST" enctype="multipart/form-data">
+
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Отправить</button>
+
+</form>

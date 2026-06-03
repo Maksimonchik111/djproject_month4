@@ -1,0 +1,16 @@
+<h1>Содержимое корзины</h1>
+<a href="{% url 'create_product' %}">Добавить товар в корзину</a>
+<ul>
+    {% for product in basket_products %}
+    <li>
+        <h2>Название товара: {{ product.product_title }}</h2>
+        <img src="{{ product.product_photo.url }}" alt="{{ product.product_title }}" width="300" height="200">
+        <p>Цена: {{ product.price }}</p>
+        <p>Количество товара: {{ product.quantity }}</p>
+        <p>Дата добавления: {{ product.added_at }}</p>
+        <br>
+        <a href="/delete_product/{{ product.id }}/delete/">Удалить</a>
+        <a href="/update_product/{{ product.id }}/update/">Редактировать</a>
+    </li>
+    {% endfor %}
+</ul>

@@ -1,0 +1,9 @@
+<h1>Добавить товар в корзину</h1>
+
+<form action="{% url 'create_product' %}" method="POST" enctype="multipart/form-data">
+
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Отправить</button>
+
+</form>
