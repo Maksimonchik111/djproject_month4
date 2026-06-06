@@ -30,6 +30,8 @@ INSTALLED_APPS = [
     'hrtour',
     'myShop',
     'basket',
+    'workregister',
+    'captcha',
 ]
 
 MIDDLEWARE = [
