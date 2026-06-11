@@ -65,7 +65,7 @@ def resume_detail_view(request, id):
 def search_view(request):
     query = request.GET.get('s', '')
     if query:
-        resumes = models.CustomUser.objects.filter(title__icontains=query)
+        resumes = models.CustomUser.objects.filter(username__icontains=query)
     else:
         return HttpResponse('Блог не найден!')
 
