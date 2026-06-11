@@ -1,7 +1,12 @@
 <h1>Туры</h1>
+<form action="{% url 'tour_search'  %}" method="GET" enctype="multipart/form-data">
+    <input type="text" type="search" name="s" placeholder="Найти тур">
+    <button type="submit">Поиск</button>
+</form>
 {% for tour in tours %}
 <h2>Название тура: {{ tour.title }}</h2>
 <p>Описание: {{ tour.description }}</p>
+<a href="{% url 'tour_detail' tour.id %}">Подробнее</a>
 
     <h3>Категории</h3>
     <p>
@@ -9,8 +14,11 @@
         {{ cat.name }} {% if not forloop.last %}, {% endif %}
         {% empty %}
         Категория не указана
+
         {% endfor %}
+
     </p>
+
     <h4>Отзывы</h4>
 
     <ul>
@@ -25,3 +33,22 @@
 
 
 {% endfor %}
+{% if not is_search %}
+<div class="pagination">
+    <span class="step-links">
+        {% if tours.has_previous %}
+            <a href="?page=1">&laquo; Первая</a>
+            <a href="?page={{ tours.previous_page_number }}">Предыдущая</a>
+        {% endif %}
+
+        <span class="current">
+            Страница {{ tours.number }} из {{ tours.paginator.num_pages }}.
+        </span>
+
+        {% if tours.has_next %}
+            <a href="?page={{ tours.next_page_number }}">Следующая</a>
+            <a href="?page={{ tours.paginator.num_pages }}">Последняя &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+{% endif %}

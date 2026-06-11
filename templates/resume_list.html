@@ -1,5 +1,8 @@
 <h1>Резюме</h1>
-
+<form action="{% url 'resume_search'  %}" method="GET" enctype="multipart/form-data">
+    <input type="text" type="search" name="s" placeholder="Найти тур">
+    <button type="submit">Поиск</button>
+</form>
 <ul>
     {% for resume in resumes %}
     <li>
@@ -10,9 +13,29 @@
         <p>Опыт работы: {{ resume.link_to_resume }}</p>
         <p>Запрос на должность: {{ resume.position }}</p>
         <p>Опыт работы(в годах): {{ resume.experience_years }}</p>
+        <a href="{% url 'resume_detail' resume.id %}">Подробнее</a>
 
     </li>
     {% endfor %}
+{% if not is_search %}
+<div class="pagination">
+    <span class="step-links">
+        {% if resumes.has_previous %}
+            <a href="?page=1">&laquo; Первая</a>
+            <a href="?page={{ resumes.previous_page_number }}">Предыдущая</a>
+        {% endif %}
+        <br>
+        <span class="current">
+            Страница {{ resumes.number }} из {{ resumes.paginator.num_pages }}.
+        </span>
+
+        {% if resumes.has_next %}
+            <a href="?page={{ resumes.next_page_number }}">Следующая</a>
+            <a href="?page={{ resumes.paginator.num_pages }}">Последняя &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+{% endif %}
 </ul>
 <form action="{% url 'logout' %}" method="POST">
     {% csrf_token %}

@@ -17,11 +17,50 @@
         h1 {
             text-align: center;
             color: #2c3e50;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
             font-size: 2.5rem;
         }
 
-        /* Сетка для карточек (адаптивная: сама подстраивается под экран) */
+        /* Стили для формы поиска */
+        .search-form {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 40px;
+        }
+
+        .search-form input[type="text"] {
+            padding: 12px 20px;
+            width: 100%;
+            max-width: 400px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-form input[type="text"]:focus {
+            border-color: #3498db;
+        }
+
+        .search-form button {
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .search-form button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Сетка для карточек */
         .books-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -41,7 +80,6 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        /* Эффект при наведении мышки на книгу */
         .book-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
@@ -59,15 +97,15 @@
         .book-card img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Картинка аккуратно заполняет блок, не растягиваясь */
+            object-fit: cover;
             transition: transform 0.5s ease;
         }
 
         .book-card:hover img {
-            transform: scale(1.05); /* Легкое увеличение обложки при наведении */
+            transform: scale(1.05);
         }
 
-        /* Контент внутри карточки (текст) */
+        /* Контент внутри карточки */
         .book-info {
             padding: 20px;
             display: flex;
@@ -93,14 +131,13 @@
             color: #7f8c8d;
         }
 
-        /* Стили для заметок */
         .book-comment {
             margin-top: 15px;
             padding-top: 15px;
             border-top: 1px dashed #e0e0e0;
             font-size: 0.9rem;
             color: #4b5563;
-            flex-grow: 1; /* Толкает кнопку "Подробнее" всегда вниз */
+            flex-grow: 1;
         }
 
         .no-comment {
@@ -108,7 +145,6 @@
             font-style: italic;
         }
 
-        /* Красивая кнопка "Подробнее" */
         .btn-more {
             display: block;
             text-align: center;
@@ -125,11 +161,51 @@
         .btn-more:hover {
             background-color: #2980b9;
         }
+
+        /* Стили для пагинации */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+        }
+
+        .step-links {
+            background: #ffffff;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .step-links a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .step-links a:hover {
+            color: #2980b9;
+        }
+
+        .step-links .current {
+            color: #555;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
     <h1>Список книг</h1>
+
+    <!-- Форма поиска -->
+    <form class="search-form" action="{% url 'search' %}" method="GET" enctype="multipart/form-data">
+        <input type="search" name="s" placeholder="Найти книгу">
+        <button type="submit">Поиск</button>
+    </form>
 
     <div class="books-grid">
         {% for book in books %}
@@ -168,6 +244,28 @@
             </div>
         {% endfor %}
     </div>
+
+{% if not is_search %}
+<div class="pagination">
+    <span class="step-links">
+        {% if books.has_previous %}
+            <a href="?page=1">&laquo; Первая</a>
+            <a href="?page={{ books.previous_page_number }}">Предыдущая</a>
+        {% endif %}
+
+        <span class="current">
+            Страница {{ books.number }} из {{ books.paginator.num_pages }}.
+        </span>
+
+        {% if books.has_next %}
+            <a href="?page={{ books.next_page_number }}">Следующая</a>
+            <a href="?page={{ books.paginator.num_pages }}">Последняя &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+{% endif %}
+
+
 
 </body>
 </html>

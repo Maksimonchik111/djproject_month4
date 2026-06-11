@@ -26,6 +26,7 @@ class HorseTour(models.Model):
     title = models.CharField(max_length=75)
     description = models.TextField()
     category = models.ManyToManyField(TourCategory)
+    views = models.PositiveIntegerField(default=0, null=True)
 
     def __str__(self):
         return self.title

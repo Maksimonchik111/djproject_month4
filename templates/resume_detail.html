@@ -1,0 +1,12 @@
+<h2>Имя: {{ resume.username }}</h2>
+<p>Телефон: {{ resume.phone_number }}</p>
+<p>EMAIL: {{ resume.email }}</p>
+<p>Пол: {{ resume.gender }}</p>
+<p>Опыт работы: {{ resume.link_to_resume }}</p>
+<p>Запрос на должность: {{ resume.position }}</p>
+<p>Опыт работы(в годах): {{ resume.experience_years }}</p>
+
+
+<p>Кол-во просмотров - {{ resume.views }}</p>
+
+<a href="{% url 'resume_list' %}">Назад к списку</a>

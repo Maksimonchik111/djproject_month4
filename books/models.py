@@ -19,6 +19,7 @@ class Book(models.Model):
         verbose_name="Количество дней бронирования"
     )
     user_comment = models.CharField(max_length=255,blank=True,null=True,verbose_name="Комментарий к бронированию (не обязательно)")
+    views = models.PositiveIntegerField(default=0, null=True)
 
     def __str__(self):
         return f'{self.author} - {self.title}'
