@@ -37,7 +37,7 @@
 </div>
 {% endif %}
 </ul>
-<form action="{% url 'logout' %}" method="POST">
+<form action="{% url 'logout' %}" method="post" style="display:inline;">
     {% csrf_token %}
-    <button type="submit">Выход</button>
+    <button type="submit" class="logout-btn">Выйти</button>
 </form>

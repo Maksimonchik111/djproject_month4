@@ -1,41 +1,52 @@
+from django.contrib.gis.geos.prototypes import get_num_geoms
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Basket
 from .forms import BasketForm
+from django.views import generic
+
+class CreateProductView(generic.CreateView):
+    template_name = 'create_product.html'
+    form_class = BasketForm
+    model = Basket
+    success_url = '/basket_product_list/'
+
+    def form_valid(self, form):
+        print(form.cleaned_data)
+        return super(CreateProductView, self).form_valid(form=form)
 
 
-def create_product_view(request):
-    if request.method == 'POST':
-        form = BasketForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('/basket_product_list/')
-    else:
-        form = BasketForm()
 
-    return render(request, 'create_product.html', {'form': form})
+class ProductListView(generic.ListView):
+    template_name = 'product_list.html'
+    model = Basket
+    context_object_name = 'basket_products'
+
+    def get_queryset(self):
+        return self.model.objects.all().order_by('-id')
 
 
+class UpdateProductView(generic.UpdateView):
+    template_name = 'update_product.html'
+    form_class = BasketForm
+    success_url = '/basket_product_list/'
+    model = Basket
+    context_object_name = "basket_product_id"
 
-def product_list_view(request):
-    if request.method == 'GET':
-        basket_products = Basket.objects.all().order_by('-id')
+    def get_object(self, **kwargs):
+        product_id = self.kwargs.get('id')
+        return get_object_or_404(self.model, id=product_id)
 
-        return render(request, 'product_list.html', {'basket_products': basket_products})
+    def form_valid(self, form):
+        print(form.cleaned_data)
+        return super(UpdateProductView, self).form_valid(form=form)
 
 
-def update_product_view(request, id):
-    basket_product_id = get_object_or_404(Basket, id=id)
-    if request.method == 'POST':
-        form = BasketForm(request.POST, instance=basket_product_id)
-        if form.is_valid():
-            form.save()
-            return redirect('/basket_product_list/')
-    else:
-        form = BasketForm(instance=basket_product_id)
+class DeleteProductView(generic.DeleteView):
+    template_name = 'confirm_delete.html'
+    context_object_name = 'product_id'
+    success_url = '/basket_product_list/'
+    model = Basket
 
-    return render(request, 'update_product.html' , {'form': form, 'basket_product_id': basket_product_id})
-
-def delete_product_view(request, id):
-    basket_product_id = get_object_or_404(Basket, id=id)
-    basket_product_id.delete()
-    return redirect('/basket_product_list/')
+    def get_object(self, **kwargs):
+        product_id = self.kwargs.get('id')
+        return get_object_or_404(self.model, id=product_id)

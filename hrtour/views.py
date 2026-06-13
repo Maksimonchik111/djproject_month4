@@ -1,40 +1,54 @@
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
-from django.shortcuts import render
+from datetime import datetime
 from . import models
 from django.core.paginator import Paginator
 from django.db.models import F
+from django.views import generic
 
-def search_view(request):
-    query = request.GET.get('s', '')
-    if query:
-        tours = models.HorseTour.objects.filter(title__icontains=query)
-    else:
-        return HttpResponse('Блог не найден!')
 
-    return render(request,
-                  template_name='tour_list.html',
-                  context={'tours': tours})
+class SearchView(generic.ListView):
+    template_name = 'tour_list.html'
+    context_object_name = 'tours'
+    model = models.HorseTour
 
-def tour_list_view(request):
-    if request.method == "GET":
-        tours = models.HorseTour.objects.all()
-        paginator = Paginator(tours, 2)
-        page = request.GET.get('page')
-        page_obj = paginator.get_page(page)
+    def get_queryset(self):
+        return self.model.objects.filter(title__icontains=self.request.GET.get('s'))
 
-        return render(request, 'tour_list.html', {'tours': page_obj})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['s'] = self.request.GET.get('s')
+        return context
 
-def tour_detail_view(request, id):
-    if request.method == 'GET':
-        tour = models.HorseTour.objects.get(id=id)
+class TourListView(generic.ListView):
+    template_name = 'tour_list.html'
+    model = models.HorseTour
+    context_object_name = 'tours'
+    paginate_by = 2
 
-        viewed_blog = request.session.get('viewed_blog', [])
+    def get_queryset(self):
+        return self.model.objects.all().order_by('-id')
 
-        if id not in viewed_blog:
-            tour.views = F("views") + 1
-            tour.save()
-            tour.refresh_from_db()
-            viewed_blog.append(id)
-            request.session['viewed_blog'] = viewed_blog
+    def get_context_data(self,**kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tour'] = context['page_obj']
+        return context
 
-        return render(request, 'tour_detail.html', context={'tour': tour})
+
+class TourDetailView(generic.DetailView):
+    template_name = 'tour_detail.html'
+    context_object_name = 'tour_id'
+    pk_url_kwarg = 'id'
+    model = models.HorseTour
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        request = self.request
+        views_blog = request.session.get('viewed_blog', [])
+
+        if obj.pk not in views_blog:
+            self.model.objects.filter(pk=obj.pk).update(views=F('views') + 1)
+            views_blog.append(obj.pk)
+            request.session['viewed_blog'] = views_blog
+            obj.refresh_from_db()
+        return obj

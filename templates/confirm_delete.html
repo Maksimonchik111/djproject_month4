@@ -1,0 +1,6 @@
+<h1>Вы уверенны что хотите удалить товар? - {{ product_id.title }}</h1>
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit">Удалить</button>
+</form>
+<button><a href="{% url 'basket_product_list' %}">Нет</a></button>

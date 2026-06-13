@@ -1,74 +1,69 @@
-from django.http import HttpResponse
-from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
-from django.contrib.auth.forms import  AuthenticationForm
-from . import models, forms
-from django.core.paginator import Paginator
-from django.db.models import F
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.views import LoginView, LogoutView
+from django.shortcuts import redirect
+from django.views import generic
+
+from . import forms, models
 
 
 
-def register_view(request):
-    if request.method == 'POST':
-        form = forms.CustomRegisterForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('/login/')
-    else:
-        form = forms.CustomRegisterForm()
+class RegisterView(generic.FormView):
+    template_name = 'register.html'
+    form_class = forms.CustomRegisterForm
+    success_url = '/login/'
 
-    return render(request, 'register.html', {'form': form})
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
 
 
-def auth_login_view(request):
-    if request.method == 'POST':
-        form = forms.CustomLoginForm(data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect('/resume_list/')
-    else:
-        form = forms.CustomLoginForm()
-    return render(request, 'login.html', {'form': form})
+class AuthLoginView(LoginView):
+    template_name = 'login.html'
+    form_class = forms.CustomLoginForm
+
+    def get_success_url(self):
+        return '/resume_list/'
+
+class AuthLogoutView(LogoutView):
+    next_page = '/login/'
 
 
-def auth_logout_view(request):
-    logout(request)
-    return redirect('/login/')
+class ResumeListView(generic.ListView):
+    template_name = 'resume_list.html'
+    paginate_by = 2
+    model = models.CustomUser
+    context_object_name = 'resumes'
+
+    def get_queryset(self):
+        return self.model.objects.all().order_by('-id')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['resumes'] = context['page_obj']
+        return context
 
 
-def resume_list_view(request):
-    resumes = models.CustomUser.objects.all().order_by('-id')
-    paginator = Paginator(resumes, 3)
-    page = request.GET.get('page')
-    page_obj = paginator.get_page(page)
+class ResumeDetailView(generic.DetailView):
+    template_name = 'resume_detail.html'
+    model = models.CustomUser
+    context_object_name = 'resume'
+    pk_url_kwarg = 'id'
 
-    return render(request, 'resume_list.html', {'resumes': page_obj})
-
-
-def resume_detail_view(request, id):
-    if request.method == 'GET':
-        resume = models.CustomUser.objects.get(id=id)
-
-        viewed_blog = request.session.get('viewed_blog', [])
-
-        if id not in viewed_blog:
-            resume.views = F("views") + 1
-            resume.save()
-            resume.refresh_from_db()
-            viewed_blog.append(id)
-            request.session['viewed_blog'] = viewed_blog
-
-        return render(request, 'resume_detail.html', context={'resume': resume})
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        return obj
 
 
-def search_view(request):
-    query = request.GET.get('s', '')
-    if query:
-        resumes = models.CustomUser.objects.filter(username__icontains=query)
-    else:
-        return HttpResponse('Блог не найден!')
+class SearchView(generic.ListView):
+    template_name = 'resume_list.html'
+    context_object_name = 'resumes'
+    model = models.CustomUser
 
-    return render(request,
-                  template_name='resume_list.html',
-                  context={'resumes': resumes})
+    def get_queryset(self):
+        return self.model.objects.filter(username__icontains=self.request.GET.get('s'))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['s'] = self.request.GET.get('s')
+        return context

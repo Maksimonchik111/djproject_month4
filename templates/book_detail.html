@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ book.title }} — Детали книги</title>
+    <title>{{ book_id.title }} — Детали книги</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -189,20 +189,20 @@
         <div class="book-detail-card">
 
             <div class="book-cover-side">
-                {% if book.image %}
-                    <img src="{{ book.image.url }}" alt="{{ book.title }}">
+                {% if book_id.image %}
+                    <img src="{{ book_id.image.url }}" alt="{{ book_id.title }}">
                 {% else %}
                     <div class="no-cover-text">Обложка отсутствует</div>
                 {% endif %}
             </div>
 
             <div class="book-info-side">
-                <h1 class="book-title">{{ book.title }}</h1>
-                <div class="book-author">{{ book.author }}</div>
+                <h1 class="book-title">{{ book_id.title }}</h1>
+                <div class="book-author">{{ book_id.author }}</div>
 
                 <div class="book-description">
-                    {% if book.description %}
-                        {{ book.description }}
+                    {% if book_id.description %}
+                        {{ book_id.description }}
                     {% else %}
                         <span class="no-description-text">Описание отсутствует.</span>
                     {% endif %}
@@ -211,24 +211,24 @@
                 <table class="specs-table">
                     <tr>
                         <td class="spec-label">Жанр</td>
-                        <td class="spec-value">{{ book.genre }}</td>
+                        <td class="spec-value">{{ book_id.genre }}</td>
                     </tr>
                     <tr>
                         <td class="spec-label">Год издания</td>
-                        <td class="spec-value">{{ book.year }} г.</td>
+                        <td class="spec-value">{{ book_id.year }} г.</td>
                     </tr>
                     <tr>
                         <td class="spec-label">Количество страниц</td>
-                        <td class="spec-value">{{ book.pages }} стр.</td>
+                        <td class="spec-value">{{ book_id.pages }} стр.</td>
                     </tr>
                     <tr>
                         <td class="spec-label">Цена аренды</td>
-                        <td class="spec-value"><strong>{{ book.price }} сом/день</strong></td>
+                        <td class="spec-value"><strong>{{ book_id.price }} сом/день</strong></td>
                     </tr>
                     <tr>
                         <td class="spec-label">Статус в библиотеке</td>
                         <td class="spec-value">
-                            {% if book.is_available %}
+                            {% if book_id.is_available %}
                                 <span class="status-available">В наличии</span>
                             {% else %}
                                 <span class="status-unavailable">Нет в наличии</span>
@@ -238,28 +238,28 @@
                     <tr>
                         <td class="spec-label">Срок бронирования</td>
                         <td class="spec-value">
-                            <span class="badge-reservation">{{ book.reservation_days }} дн.</span>
+                            <span class="badge-reservation">{{ book_id.reservation_days }} дн.</span>
                         </td>
                     </tr>
                     <tr>
                         <td class="spec-label">Добавлено в базу</td>
-                        <td class="spec-value class=date-text">
-                            {{ book.created_at|date:"d.m.Y H:i" }}
+                        <td class="spec-value date-text">
+                            {{ book_id.created_at|date:"d.m.Y H:i" }}
                         </td>
                     </tr>
                 </table>
 
-                {% if book.user_comment %}
+                {% if book_id.user_comment %}
                     <div class="comment-box">
                         <strong>Ваша заметка к заказу:</strong> <br>
-                        {{ book.user_comment }}
+                        {{ book_id.user_comment }}
                     </div>
                 {% else %}
                     <div class="comment-box-empty">
                         <strong>Заметка:</strong> <span class="no-comment">Вы не оставили комментарий к этой книге.</span>
                     </div>
                 {% endif %}
-                <p>Кол-во просмотров - {{ book.views }}</p>
+                <p>Кол-во просмотров - {{ book_id.views }}</p>
 
             </div>
 
