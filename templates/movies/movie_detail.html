@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ movie.movie_title }}</title>
+</head>
+<body>
+
+    <p><a href="/movie_list/">Назад к списку фильмов</a></p>
+
+    <div>
+        <a href="/movie_edit/{{ movie.id }}/">Редактировать фильм</a> |
+        <a href="/movie_delete/{{ movie.id }}/">Удалить фильм</a>
+    </div>
+
+    <h1>{{ movie.movie_title }}</h1>
+
+    {% if movie.image %}
+        <img src="{{ movie.image.url }}" alt="{{ movie.movie_title }}" width="300">
+    {% endif %}
+
+    <p><b>Жанры:</b> {% for g in movie.genre.all %}{{ g.genre_name }} {% endfor %}</p>
+    <p><b>Режиссер:</b> {{ movie.director }}</p>
+    <p><b>Рейтинг:</b> {{ movie.rating }}</p>
+    <p><b>Бюджет:</b> ${{ movie.budget }}</p>
+    <p><b>Дата выхода:</b> {{ movie.release_date }}</p>
+    <p><b>Возрастное ограничение:</b> {{ movie.age_limit }}+</p>
+    <p><b>Страна:</b> {{ movie.country }}</p>
+
+    <h3>Описание:</h3>
+    <p>{{ movie.description }}</p>
+
+    <hr>
+
+    <h3>Бронирование VIP-места</h3>
+    {% if user.is_authenticated %}
+        <form action="/movie_list/{{ movie.id }}/book_vip/" method="post">
+            {% csrf_token %}
+            <label>Выберите место:</label>
+            <select name="seat_number">
+                <option value="1">Ряд 1, Место 1</option>
+                <option value="2">Ряд 1, Место 2</option>
+                <option value="3">Ряд 2, Место 1</option>
+            </select>
+            <button type="submit">Забронировать</button>
+        </form>
+    {% else %}
+        <p><a href="/user_login/">Войдите</a>, чтобы забронировать VIP-место.</p>
+    {% endif %}
+
+    <hr>
+
+    <h3>Комментарии</h3>
+    {% if user.is_authenticated %}
+        <form action="/movie_list/{{ movie.id }}/add_comment/" method="post">
+            {% csrf_token %}
+            <textarea name="comment_text" rows="3" placeholder="Ваш отзыв..." required></textarea><br>
+            <button type="submit">Отправить</button>
+        </form>
+    {% else %}
+        <p><a href="/user_login/">Войдите</a>, чтобы оставлять комментарии.</p>
+    {% endif %}
+
+    <h4>Все отзывы:</h4>
+    {% for comment in comments %}
+        <div>
+            <p><b>{{ comment.commentator.username }}</b> ({{ comment.created_at }})</p>
+            <p>{{ comment.comment_text }}</p>
+        </div>
+        <hr>
+    {% empty %}
+        <p>Комментариев пока нет.</p>
+    {% endfor %}
+
+</body>
+</html>

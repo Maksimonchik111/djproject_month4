@@ -1,4 +1,3 @@
-from django.contrib.gis.geos.prototypes import get_num_geoms
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Basket
 from .forms import BasketForm
